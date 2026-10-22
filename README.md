@@ -46,7 +46,8 @@ comes from, and its own opinion of the claim is not part of the verdict.
 
 - **Teacher:** a large open model (Qwen3.6-35B-A3B on our own server) labels
   claims → queries, and claims + search results → verdicts with citations.
-- **Data:** claims paired with passages, not with a ruling on the claim:
+- **Data:** VitaminC and FEVER as the base
+  (Wikipedia passages, open licences): claims paired with passages, not with a ruling on the claim:
   the same claim with a passage that supports it, one that contradicts it and
   one off topic. Both sides of contested claims, in Spanish and English, with
   passages anonymized (no outlet name). Plus adversarial cases: a passage that
@@ -56,9 +57,11 @@ comes from, and its own opinion of the claim is not part of the verdict.
   has its own leanings, and the eval set is where they would show.
 - **Eval before and after**, on a held-out set: output format kept (where
   small models fail most), verdict accuracy, query quality (does a trusted
-  source come back), and citations that really support the sentence. Same method as Lapacho's `terms-eval`.
-- **Cheaper work on the weights**, measured either way: Q4 vs Q8 and E2B vs
-  E4B (quality, seconds per check, RAM, app size).
+  source come back), citations that really support the sentence, and a
+  bias check: does the verdict flip when only the outlet name or the
+  political side of the claim changes? Same method as Lapacho's `terms-eval`.
+- **Cheaper work on the weights**, measured either way: Q4 vs Q8, Google's
+  QAT q4_0 vs regular quantization, E2B vs E4B (quality, seconds per check, RAM, app size).
 - **Weights published** on Hugging Face (Apache-2.0, like Gemma 4), with the
   dataset card and the eval numbers.
 
