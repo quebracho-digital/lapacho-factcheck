@@ -1,2 +1,8 @@
 2do.txt
 target/
+train/data/raw/
+train/data/tiny/
+train/data/teacher.jsonl
+train/data/train.jsonl
+train/data/eval_items.jsonl
+train/data/run.log
