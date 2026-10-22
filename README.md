@@ -14,10 +14,11 @@ DEV's Hacktoberfest Open-Source AI Challenge, Week 3 (Oct 19–25, 2026).
 3. **On the device**, a fine-tuned Gemma reads the clip and writes 1–3 search
    queries.
 4. Only those queries go out, to SerpApi: first restricted to trusted sites
-   (`trusted.txt`), then an open search if nothing comes back.
+   — **yours**: an editable `trusted.txt`, no outlet built in as the arbiter
+   — then an open search if nothing comes back.
 5. Gemma, still on the device, reads the results and writes a verdict for each
-   claim: **supported**, **contradicted** or **not enough evidence**, each
-   with its source URLs. Sources from the open search are marked unverified.
+   claim, **according to your sources**: supported, contradicted or not
+   enough evidence, each with the URLs and the passage it rests on. Sources from the open search are marked unverified.
 6. The verdict comes back to Lapacho as a new clip.
 
 ## Why on-device, stated honestly
@@ -35,13 +36,24 @@ It is not offline: the search needs the internet. What stays on the device:
 A small model (E2B) is fast enough on a phone but sloppy at two narrow jobs:
 writing search queries and writing a verdict that only claims what the
 sources say. Those are exactly the jobs we tune it for, with LoRA on the open
-weights:
+weights.
+
+**The model doesn't decide who to trust; you do.** Which sources count is the
+user's list, not something baked into the weights. So the tuning teaches a
+skill with no editorial line in it: *does this passage support, contradict
+or not address this claim?* The model is never told which outlet a passage
+comes from, and its own opinion of the claim is not part of the verdict.
 
 - **Teacher:** a large open model (Qwen3.6-35B-A3B on our own server) labels
   claims → queries, and claims + search results → verdicts with citations.
-- **Data:** claims in Spanish and English (FEVER, public fact-check archives
-  such as Chequeado's; each set's licence checked before use), plus adversarial cases (results that don't mention the claim; a source that
-  says the opposite; a prompt injection hidden in a result).
+- **Data:** claims paired with passages, not with a ruling on the claim:
+  the same claim with a passage that supports it, one that contradicts it and
+  one off topic. Both sides of contested claims, in Spanish and English, with
+  passages anonymized (no outlet name). Plus adversarial cases: a passage that
+  sounds sure but doesn't address the claim, a prompt injection hidden in a
+  result.
+- **Labels checked by a person**, not only by the teacher: the teacher model
+  has its own leanings, and the eval set is where they would show.
 - **Eval before and after**, on a held-out set: output format kept (where
   small models fail most), verdict accuracy, query quality (does a trusted
   source come back), and citations that really support the sentence. Same method as Lapacho's `terms-eval`.

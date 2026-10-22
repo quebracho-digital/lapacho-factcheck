@@ -34,6 +34,8 @@ with the numbers. A fine-tune that's worse isn't a feature.
   format. Decide on day 1 by trying llama.cpp first.
 - **SerpApi free quota** (serpapi.com/pricing): enough for the eval set plus
   the demo? If not, cache results during the eval.
+- **Default `trusted.txt`:** ship it empty with a few lists to pick from on
+  first run, or the user's own? The demo uses Leo's list.
 - **Team:** Leo alone or with fluuix; who publishes the post.
 
 ## After the hackathon
