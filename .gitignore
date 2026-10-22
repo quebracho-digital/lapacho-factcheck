@@ -6,3 +6,4 @@ train/data/teacher.jsonl
 train/data/train.jsonl
 train/data/eval_items.jsonl
 train/data/run.log
+train/data/eval_out/*.err

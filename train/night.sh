@@ -7,11 +7,10 @@ cd "$(dirname "$0")"
 PY=../bin/python
 LLAMA=~/Proyects/llama.cpp/llama.cpp
 
-# The teacher (and anything else in the router) out of the shared memory.
-K=$(cat ~/.config/llama-api-key)
-curl -s -X POST localhost:8080/models/unload -H "Authorization: Bearer $K" -H 'Content-Type: application/json' \
-  -d '{"model":"unsloth/Qwen3.6-35B-A3B-GGUF:Q4_K_XL"}' || true
-echo
+# The router (teacher and any other model) off the shared memory while training;
+# back on when this script ends, however it ends.
+systemctl --user stop llama-router
+trap 'systemctl --user start llama-router' EXIT
 
 $PY lora.py train train.jsonl out
 $PY lora.py merge out
