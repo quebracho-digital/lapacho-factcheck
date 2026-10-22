@@ -1,0 +1,12 @@
+{
+  "id": "fact-check-gemma",
+  "name": "Fact check (Gemma, your sources)",
+  "description": "Gemma on this computer writes search queries, searches your trusted sites, and rates each claim against what they say",
+  "command": "lapacho-factcheck",
+  "args": [],
+  "params": [
+    { "name": "preview", "label": "Only show the queries (nothing is sent)", "kind": "flag" },
+    { "name": "queries", "label": "Search for instead (separate with ;)" }
+  ],
+  "timeout_secs": 300
+}
