@@ -1,0 +1,93 @@
+name: Android release
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "v*" ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,x86_64-linux-android
+
+      - name: Install cargo-ndk
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-ndk
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Set up NDK
+        run: |
+          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "ndk;27.2.12479018" >/dev/null
+          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.2.12479018" >> "$GITHUB_ENV"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Setup signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.LAPACHO_RELEASE_KEYSTORE_B64 }}
+          PASSWORD: ${{ secrets.LAPACHO_RELEASE_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ] && [ -n "$PASSWORD" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.p12"
+            echo "LAPACHO_RELEASE_KEYSTORE=$RUNNER_TEMP/release.p12" >> "$GITHUB_ENV"
+            echo "LAPACHO_RELEASE_KEYSTORE_PASSWORD=$PASSWORD" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build debug APK
+        if: github.ref_type != 'tag'
+        working-directory: apps/android
+        run: gradle :app:assembleDebug
+
+      - name: Build release APK
+        if: github.ref_type == 'tag'
+        working-directory: apps/android
+        run: gradle :app:assembleRelease
+
+      - name: Prepare APKs
+        id: prepare_apk
+        run: |
+          mkdir -p "$RUNNER_TEMP/out"
+          if [ "$GITHUB_REF_TYPE" = 'tag' ]; then
+            APK_NAME="lapacho-factcheck-${GITHUB_REF_NAME}.apk"
+            cp apps/android/app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/out/$APK_NAME"
+            cd "$RUNNER_TEMP/out"
+            sha256sum "$APK_NAME" > "$APK_NAME.sha256"
+            echo "artifact_name=lapacho-factcheck-${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            APK_NAME="app-debug.apk"
+            cp apps/android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/out/$APK_NAME"
+            SHORT_SHA="${GITHUB_SHA:0:7}"
+            echo "artifact_name=lapacho-factcheck-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.prepare_apk.outputs.artifact_name }}
+          path: ${{ runner.temp }}/out/
+          retention-days: 14
+
+      - name: GitHub Release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP"/out/* --title "Lapacho Fact-check $GITHUB_REF_NAME" --generate-notes
