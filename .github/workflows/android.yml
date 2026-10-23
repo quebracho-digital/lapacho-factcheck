@@ -35,6 +35,8 @@ jobs:
         run: |
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "ndk;27.2.12479018" >/dev/null
           echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.2.12479018" >> "$GITHUB_ENV"
+          # Also read by cargo-ndk; the runner's own points at a different NDK.
+          echo "ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/27.2.12479018" >> "$GITHUB_ENV"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -46,6 +48,10 @@ jobs:
           KEYSTORE_B64: ${{ secrets.LAPACHO_RELEASE_KEYSTORE_B64 }}
           PASSWORD: ${{ secrets.LAPACHO_RELEASE_KEYSTORE_PASSWORD }}
         run: |
+          # A tag signed with a throwaway debug key could never be updated in place.
+          if [ "$GITHUB_REF_TYPE" = tag ] && { [ -z "$KEYSTORE_B64" ] || [ -z "$PASSWORD" ]; }; then
+            echo "::error::secrets LAPACHO_RELEASE_KEYSTORE_B64(_PASSWORD) are not set"; exit 1
+          fi
           if [ -n "$KEYSTORE_B64" ] && [ -n "$PASSWORD" ]; then
             echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.p12"
             echo "LAPACHO_RELEASE_KEYSTORE=$RUNNER_TEMP/release.p12" >> "$GITHUB_ENV"
