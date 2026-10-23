@@ -5,8 +5,10 @@ A [Lapacho](https://github.com/quebracho-digital/lapacho) plugin, built for
 DEV's Hacktoberfest Open-Source AI Challenge, Week 3 (Oct 19–25, 2026).
 
 > Status (2026-10-23): the desktop plugin works, with our fine-tune of Gemma 4
-> E2B (verdict accuracy 57.6% → 77.8% on the eval, below). The Android plugin
-> app builds (llama.cpp through the NDK); testing on a phone is next. Any
+> E2B, v1 (verdict accuracy 70.1% → 78.4% under the strict rule, 57.6% → 77.8%
+> with the datasets' labels; it is worse than stock at "not enough evidence",
+> see the eval below). Model and data are on Hugging Face; a v2 is training.
+> The Android APK is on GitHub Releases; testing on a phone is next. Any
 > commit after the deadline (2026-10-25 23:59 PDT) will be listed here.
 
 ## What it does
@@ -53,6 +55,14 @@ It is not offline: the search needs the internet. What stays on the device:
 What does leave: the 1–3 queries, to SerpApi and the search engine behind it,
 which can see them. The clip itself never goes out.
 
+## Install (Android)
+
+The APK is on [GitHub Releases](https://github.com/quebracho-digital/lapacho-factcheck/releases),
+signed with the same key as Lapacho's. With [Obtainium](https://obtainium.imranr.dev/), add
+`https://github.com/quebracho-digital/lapacho-factcheck` and it keeps the app updated; or open the
+`.apk` from the release page on the phone. On first run the app downloads the model (3.4 GB);
+then set your SerpApi key and trusted sites in its settings.
+
 ## Install (desktop)
 
 Needs Rust and a C++ toolchain (llama.cpp is built from source by the
@@ -69,7 +79,9 @@ cp apps/desktop/fact-check-gemma.json ~/.local/share/digital.quebracho.lapacho/p
 ```
 
 The plugin shows up the next time you open a clip in Lapacho. The model is
-any Gemma 4 GGUF; ours is on Hugging Face (below). Without Lapacho, the
+any Gemma 4 GGUF; ours is
+[quebracho-digital/gemma-4-E2B-it-factcheck](https://huggingface.co/quebracho-digital/gemma-4-E2B-it-factcheck)
+(`gemma-4-E2B-it-factcheck-Q4_K_M.gguf`). Without Lapacho, the
 binary is a plain filter:
 
 ```sh
@@ -97,8 +109,9 @@ answers Lapacho's `RUN_PLUGIN` intent like *Lapacho Terms*.
 
 GitHub Actions builds and tests the Rust core on every push and pull request.
 Android builds (`app-debug.apk`) run on PRs and pushes to `main`. Pushing a
-tag like `v1.0.0` builds a release APK, signs it with the release key (if the
-secrets are set) and publishes it as a GitHub release.
+tag like `v1.0.0` builds a release APK, signs it with Lapacho's release key
+(secrets `LAPACHO_RELEASE_KEYSTORE_B64` and `LAPACHO_RELEASE_KEYSTORE_PASSWORD`;
+without them the tag fails) and publishes it as a GitHub release.
 
 ## Trusted sites
 
@@ -124,6 +137,9 @@ address this claim?* The model is never told which outlet a passage comes
 from, and its own opinion of the claim is not part of the verdict.
 
 ### Data (`train/data.py`)
+
+Published as [quebracho-digital/lapacho-factcheck-data](https://huggingface.co/datasets/quebracho-digital/lapacho-factcheck-data)
+(train v1, eval, strict eval).
 
 - **Base:** [VitaminC](https://huggingface.co/datasets/tals/vitaminc) and
   [FEVER](https://huggingface.co/datasets/copenlu/fever_gold_evidence), both
