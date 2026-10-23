@@ -4,66 +4,169 @@ Fact-check a clip with **Gemma running on your own device**, phone or desktop.
 A [Lapacho](https://github.com/quebracho-digital/lapacho) plugin, built for
 DEV's Hacktoberfest Open-Source AI Challenge, Week 3 (Oct 19–25, 2026).
 
-> Status: idea and plan. Started 2026-10-22. Any commit after the deadline
-> (2026-10-25 23:59 PDT) will be listed here.
+> Status (2026-10-23): the desktop plugin works, with our fine-tune of Gemma 4
+> E2B (verdict accuracy 57.6% → 77.8% on the eval, below). The Android plugin
+> app builds (llama.cpp through the NDK); testing on a phone is next. Any
+> commit after the deadline (2026-10-25 23:59 PDT) will be listed here.
 
 ## What it does
 
 1. You copy a dubious claim. Lapacho keeps it as a clip.
 2. You send the clip to *Fact-check*, like any other Lapacho plugin.
 3. **On the device**, a fine-tuned Gemma reads the clip and writes 1–3 search
-   queries.
-4. Only those queries go out, to SerpApi: first restricted to trusted sites
-   — **yours**: an editable `trusted.txt`, no outlet built in as the arbiter
-   — then an open search if nothing comes back.
+   queries, in the clip's language.
+4. Only those queries go out, to SerpApi: first restricted to **your** trusted
+   sites (an editable `trusted.txt`; no outlet is built in as the arbiter),
+   then an open search if nothing comes back.
 5. Gemma, still on the device, reads the results and writes a verdict for each
    claim, **according to your sources**: supported, contradicted or not
-   enough evidence, each with the URLs and the passage it rests on. Sources from the open search are marked unverified.
+   enough evidence, each with the URL and the passage it rests on. Sources
+   from the open search are marked unverified.
 6. The verdict comes back to Lapacho as a new clip.
+
+A real run (fine-tuned E2B on a laptop CPU, 39 s):
+
+```
+$ echo "La inflación de Argentina en 2023 fue de 211%, la más alta desde 1991." | lapacho-factcheck
+Fact-check, according to your sources
+
+SUPPORTED: La inflación de Argentina en 2023 fue de 211%, la más alta desde 1991.
+  "Argentina's annual inflation rate ended 2023 at 211.4%"
+  https://www.reuters.com/markets/argentina-annual-inflation-tops-211-highest-since-early-90s-2024-01-11/
+
+Searched for:
+- inflación Argentina 2023 porcentaje
+- inflación Argentina 1991 porcentaje
+- historial inflación Argentina 2023
+```
 
 ## Why on-device, stated honestly
 
 It is not offline: the search needs the internet. What stays on the device:
 
 - **The clip.** Only the queries the model wrote leave it. Queries are made
-  from the clip, so they can carry part of it; the plugin shows them before
-  sending (and you can edit them).
+  from the clip, so they can carry part of it; the plugin can show them
+  before sending, and you can write your own instead.
 - **The model and its cost.** No API key for the model, no per-token bill, no
   provider reading what you check.
+
+## Install (desktop)
+
+Needs Rust and a C++ toolchain (llama.cpp is built from source by the
+`llama-cpp-2` crate), and [Lapacho](https://github.com/quebracho-digital/lapacho)
+for the plugin.
+
+```sh
+cargo install --path apps/desktop          # puts lapacho-factcheck in ~/.cargo/bin
+mkdir -p ~/.config/lapacho-factcheck
+echo /path/to/gemma-4-E2B-it-factcheck-Q4_K_M.gguf > ~/.config/lapacho-factcheck/model
+echo YOUR_SERPAPI_KEY > ~/.config/lapacho-factcheck/serpapi_key   # serpapi.com, free plan: 250 searches/month
+cp examples/trusted-mbfc.txt ~/.config/lapacho-factcheck/trusted.txt  # then make it yours
+cp apps/desktop/fact-check-gemma.json ~/.local/share/digital.quebracho.lapacho/plugins/
+```
+
+The plugin shows up the next time you open a clip in Lapacho. The model is
+any Gemma 4 GGUF; ours is on Hugging Face (below). Without Lapacho, the
+binary is a plain filter:
+
+```sh
+echo "La inflación de 2023 fue de 150%." | lapacho-factcheck
+echo "..." | LAPACHO_PARAM_PREVIEW=1 lapacho-factcheck   # only show the queries
+```
+
+`SERPAPI_KEY` and `LAPACHO_FACTCHECK_MODEL` override the files.
+
+## Build (Android)
+
+Needs JDK 17, the Android SDK (platform 35) and NDK, Gradle 8.10, and Rust
+with `cargo-ndk` and the targets `aarch64-linux-android` and
+`x86_64-linux-android`:
+
+```sh
+cd apps/android
+ANDROID_NDK_HOME=~/Android/Sdk/ndk/27.2.12479018 gradle :app:assembleDebug
+```
+
+The app downloads the model on first run (3.4 GB, from Hugging Face) and
+answers Lapacho's `RUN_PLUGIN` intent like *Lapacho Terms*.
+
+## Trusted sites
+
+`~/.config/lapacho-factcheck/trusted.txt`, one domain per line. An empty or
+missing list means every source is from the open search and marked
+unverified. `examples/trusted-mbfc.txt` is the list we use in the demo: Media
+Bias/Fact Check's *Least Biased* and *Pro-Science* outlets with High or Very
+High factual reporting, plus one addition, with the outlets left out by that
+rule listed (commented) on both sides. Edit it; it is yours.
 
 ## Why fine-tune Gemma
 
 A small model (E2B) is fast enough on a phone but sloppy at two narrow jobs:
-writing search queries and writing a verdict that only claims what the
-sources say. Those are exactly the jobs we tune it for, with LoRA on the open
-weights.
+writing search queries in the clip's language, and writing a verdict that only
+claims what the sources say. Those are the jobs we tune it for, with LoRA on
+the open weights.
 
-**The model doesn't decide who to trust; you do.** Which sources count is the
-user's list, not something baked into the weights. So the tuning teaches a
-skill with no editorial line in it: *does this passage support, contradict
-or not address this claim?* The model is never told which outlet a passage
-comes from, and its own opinion of the claim is not part of the verdict.
+**The model doesn't decide who to trust; you do.** The tuning teaches a skill
+with no editorial line in it: *does this passage support, contradict or not
+address this claim?* The model is never told which outlet a passage comes
+from, and its own opinion of the claim is not part of the verdict.
 
-- **Teacher:** a large open model (Qwen3.6-35B-A3B on our own server) labels
-  claims → queries, and claims + search results → verdicts with citations.
-- **Data:** VitaminC and FEVER as the base
-  (Wikipedia passages, open licences): claims paired with passages, not with a ruling on the claim:
-  the same claim with a passage that supports it, one that contradicts it and
-  one off topic. Both sides of contested claims, in Spanish and English, with
-  passages anonymized (no outlet name). Plus adversarial cases: a passage that
-  sounds sure but doesn't address the claim, a prompt injection hidden in a
-  result.
-- **Labels checked by a person**, not only by the teacher: the teacher model
-  has its own leanings, and the eval set is where they would show.
-- **Eval before and after**, on a held-out set: output format kept (where
-  small models fail most), verdict accuracy, query quality (does a trusted
-  source come back), citations that really support the sentence, and a
-  bias check: does the verdict flip when only the outlet name or the
-  political side of the claim changes? Same method as Lapacho's `terms-eval`.
-- **Cheaper work on the weights**, measured either way: Q4 vs Q8, Google's
-  QAT q4_0 vs regular quantization, E2B vs E4B (quality, seconds per check, RAM, app size).
-- **Weights published** on Hugging Face (Apache-2.0, like Gemma 4), with the
-  dataset card and the eval numbers.
+### Data (`train/data.py`)
+
+- **Base:** [VitaminC](https://huggingface.co/datasets/tals/vitaminc) and
+  [FEVER](https://huggingface.co/datasets/copenlu/fever_gold_evidence), both
+  CC BY-SA 3.0: Wikipedia claims paired with passages, usually both sides of
+  the same claim (a passage that supports it and one that contradicts it or
+  doesn't address it). Passages go in by number with distractors from other
+  articles, exactly as the app builds the prompt.
+- **Spanish:** claims and passages translated by the teacher, and Spanish
+  claims over English passages.
+- **Adversarial:** a passage that sounds sure of itself but doesn't address
+  the claim, and a prompt injection inside a search result.
+- **Teacher:** Qwen3.6-35B-A3B (on our own server) translates, writes the
+  adversarial passages and the queries, and answers the same prompt the app
+  sends. The **verdict comes from the dataset**, not the teacher: when the
+  teacher disagrees, the example is dropped (1,016 dropped), so the model
+  doesn't learn the teacher's leanings.
+- **Result:** 3,212 rows: 2,084 verdicts (en 1,382 / es 702; supported 1,021,
+  contradicted 585, not enough evidence 592) and 1,128 query rows (es 353).
+
+### Training (`train/lora.py`, `train/night.sh`)
+
+LoRA r16 / alpha 32 on the text decoder of `google/gemma-4-E2B-it` (24M
+trainable parameters), transformers + PEFT in bf16 on an AMD Radeon 890M iGPU
+(ROCm 7): 2 epochs, 394 steps, 4 hours. Loss only on the answer. Validation
+loss 1.27 → 0.25. Merged and exported to GGUF Q4_K_M with llama.cpp.
+
+### Eval (`train/eval.py`)
+
+A held-out set from the datasets' test splits (no Wikipedia page shared with
+training): 95 claims, plus 40 copies with an outlet name in front
+("CNN reported:", "Página/12 informó:") and 20 fictional political claims
+in mirrored pairs (kirchnerista/macrista, Democratic/Republican). The flip
+test asks whether the verdict changes when only the outlet or the side
+changes. Same method as Lapacho's `terms-eval`.
+
+Results, Gemma 4 E2B Q4_K_M on a laptop CPU (`train/data/eval_out/`):
+
+| | stock E2B | fine-tuned |
+|---|---|---|
+| Verdict accuracy, 99 claims | 57.6% | **77.8%** |
+| · claims in English / Spanish | 54.4% / 61.9% | 78.9% / 76.2% |
+| · prompt injection in a passage (8) | 2 | 6 |
+| · Spanish claim, English passages (5) | 1 | 3 |
+| JSON the app can parse | 100% (half with `source` as a string, most in code fences) | 100% |
+| Sure verdicts citing the right passage | 78 of 101 | 104 of 117 |
+| Quotes really in the cited passage | 93 of 101 | 117 of 117 |
+| Verdict flips when only the outlet changes (20 groups) | 1 | **0** |
+| Verdict flips when only the political side changes (10 pairs) | 1 | 1 |
+| Spanish clips with every query in Spanish (42) | 14 | **42** |
+| First query finds the claim's Wikipedia article (95) | 33 | 29 |
+| Seconds: queries / verdict | 3.0 / 13.5 | 4.5 / 13.4 |
+
+The expected verdicts are the datasets' and haven't been reviewed by a person
+yet. The teacher disagrees with them on 28 of the 99 claims; there the
+fine-tune goes from 4 to 15 right, so it isn't only copying the teacher.
 
 ## How it is built
 
@@ -71,27 +174,27 @@ One Rust core, two front ends, the same shape as Lapacho Voice:
 
 ```
 crates/factcheck-core    queries → SerpApi → verdict; prompts; trusted.txt
-                         llama.cpp (GGUF) for Gemma
+                         llama.cpp (GGUF) for Gemma, via llama-cpp-2
 apps/desktop             `lapacho-factcheck` binary: stdin → stdout,
                          a Lapacho external plugin
 apps/android             plugin app: RUN_PLUGIN intent, uniffi bridge to the
-                         core, settings (SerpApi key, model download)
-train/                   dataset building, LoRA (Unsloth), eval, GGUF export
+                         core, settings (SerpApi key, trusted sites, model
+                         download); the queries are shown before they're sent
+train/                   dataset, LoRA (transformers + PEFT), eval, GGUF export
+examples/                trusted-sites list used in the demo
 ```
 
-- **Model:** Gemma 4 E2B on the phone, E4B where it fits; GGUF q4 through
-  llama.cpp, so desktop and Android run the same file.
-- **SerpApi key:** you paste your own in the settings. Never committed.
-- **Network:** only this plugin app holds the internet permission. Lapacho and
-  its keyboard don't.
+- **SerpApi key:** you paste your own. Never committed.
+- **Network:** on Android only this plugin app holds the internet permission.
+  Lapacho and its keyboard don't.
 
 ## Built on
 
 Lapacho's plugin contract (`docs/PLUGINS.md` in Lapacho) is the only thing
 taken from Lapacho; the fact-check logic, prompts, training and eval are new
-in this repo. Android plugin-app boilerplate (manifest, intent handling)
-follows *Lapacho Terms*.
+in this repo.
 
 ## Licence
 
-MIT OR Apache-2.0, like Lapacho. Gemma 4 weights: Apache-2.0.
+Code: MIT OR Apache-2.0, like Lapacho. Gemma 4 weights and our fine-tune:
+Apache-2.0. The dataset is CC BY-SA 3.0, like VitaminC and FEVER.
