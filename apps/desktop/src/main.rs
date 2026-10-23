@@ -1,7 +1,8 @@
 //! Lapacho external plugin: the clip on stdin, the verdict on stdout.
 //!
 //! Settings live in `~/.config/lapacho-factcheck/`:
-//! `model` (path to the GGUF), `serpapi_key`, `trusted.txt` (one domain per line).
+//! `model` (path to the GGUF), `serpapi_key`, `trusted.txt` (one domain per line),
+//! `search_url` (the preview's search links, query appended; Google by default).
 //! `SERPAPI_KEY` and `LAPACHO_FACTCHECK_MODEL` override the files.
 //! Plugin params: `preview` (flag) prints the queries without searching;
 //! `queries` (text, `;`-separated) replaces the model's queries.
@@ -36,9 +37,14 @@ fn run() -> Result<()> {
 
     if std::env::var("LAPACHO_PARAM_PREVIEW").as_deref() == Ok("1") {
         let raw = llm.chat(&factcheck_core::queries_prompt(&clip), 128)?;
+        let search_url = std::fs::read_to_string(dir.join("search_url"))
+            .map(|s| s.trim().to_string())
+            .unwrap_or_else(|_| "https://www.google.com/search?q=".into());
         println!("Would search for (nothing sent):");
         for q in factcheck_core::parse_queries(&raw) {
-            println!("- {q}");
+            // ponytail: plain text, not a Markdown link; Lapacho can't open links in a browser yet.
+            let q_enc: String = form_urlencoded::byte_serialize(q.as_bytes()).collect();
+            println!("- {q}\n  {search_url}{q_enc}");
         }
         return Ok(());
     }

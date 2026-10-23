@@ -7,3 +7,4 @@ license.workspace = true
 [dependencies]
 anyhow = "1"
 factcheck-core = { path = "../../crates/factcheck-core" }
+form_urlencoded = "1"
