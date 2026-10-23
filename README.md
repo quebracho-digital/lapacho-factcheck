@@ -50,6 +50,9 @@ It is not offline: the search needs the internet. What stays on the device:
 - **The model and its cost.** No API key for the model, no per-token bill, no
   provider reading what you check.
 
+What does leave: the 1–3 queries, to SerpApi and the search engine behind it,
+which can see them. The clip itself never goes out.
+
 ## Install (desktop)
 
 Needs Rust and a C++ toolchain (llama.cpp is built from source by the
@@ -61,7 +64,7 @@ cargo install --path apps/desktop          # puts lapacho-factcheck in ~/.cargo/
 mkdir -p ~/.config/lapacho-factcheck
 echo /path/to/gemma-4-E2B-it-factcheck-Q4_K_M.gguf > ~/.config/lapacho-factcheck/model
 echo YOUR_SERPAPI_KEY > ~/.config/lapacho-factcheck/serpapi_key   # serpapi.com, free plan: 250 searches/month
-cp examples/trusted-mbfc.txt ~/.config/lapacho-factcheck/trusted.txt  # then make it yours
+cp examples/trusted-example.txt ~/.config/lapacho-factcheck/trusted.txt  # then make it yours
 cp apps/desktop/fact-check-gemma.json ~/.local/share/digital.quebracho.lapacho/plugins/
 ```
 
@@ -94,10 +97,12 @@ answers Lapacho's `RUN_PLUGIN` intent like *Lapacho Terms*.
 
 `~/.config/lapacho-factcheck/trusted.txt`, one domain per line. An empty or
 missing list means every source is from the open search and marked
-unverified. `examples/trusted-mbfc.txt` is the list we use in the demo: Media
-Bias/Fact Check's *Least Biased* and *Pro-Science* outlets with High or Very
-High factual reporting, plus one addition, with the outlets left out by that
-rule listed (commented) on both sides. Edit it; it is yours.
+unverified. `examples/trusted-example.txt` is the list we use in the demo: one
+person's picks of wire services, primary-source and science outlets, with a
+few more left commented out. Each site is tagged on two separate axes, lean
+and ownership (`[state-funded]`, `[state-controlled]`), and outlets tied to a
+state, from the BBC to RT, are off by default. The tags are one person's
+judgment, the plugin ignores them, and nothing here endorses an outlet. Edit it; it is yours.
 
 ## Why fine-tune Gemma
 
@@ -187,6 +192,28 @@ examples/                trusted-sites list used in the demo
 - **SerpApi key:** you paste your own. Never committed.
 - **Network:** on Android only this plugin app holds the internet permission.
   Lapacho and its keyboard don't.
+
+## Roadmap
+
+Not built; this is the plan after the challenge.
+
+**Hosted search, without an account on SerpApi.** Pasting a SerpApi key is fine
+for a hackathon and too much for most people. A paid plan would run the search
+for you. Bringing your own key stays free and supported.
+
+The privacy commitment doesn't loosen because we'd be in the middle:
+
+- **No logs.** The service keeps no queries, no IPs and no per-user history.
+  The server is open source, so this can be checked, not only promised.
+- **Valid subscriber, unknown user.** The app proves "I have a paid, current
+  plan" with an anonymous token (blind signatures, as in Privacy Pass,
+  RFC 9576–9578), not an account login. The service can verify the token but
+  can't tell which subscriber sent it, nor link two searches to one person.
+  Zero-knowledge proofs would also work; blind tokens are simpler and enough.
+- **What a hosted search still sees:** the query text, and the network address
+  unless it goes through a relay (Oblivious HTTP). Both stay in the plan:
+  you keep approving the queries before they go, and the relay is the part
+  that hides who sent them.
 
 ## Built on
 

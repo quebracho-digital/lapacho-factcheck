@@ -41,7 +41,7 @@ with the numbers. A fine-tune that's worse isn't a feature.
 ## After the hackathon
 
 - **Trusted sites as rich as `ai_provider_universal_factcheck`:** include and
-  exclude lists, an imported bias list (MBFC), domains per topic, the local
+  exclude lists, an importable third-party rating list (check its licence first), domains per topic, the local
   index before the web.
 - **Other search backends** (SearXNG self-hosted, so no key is needed).
 - **One Gemma on the phone for several Lapacho plugins**, each measured

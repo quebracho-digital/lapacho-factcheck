@@ -1,0 +1,54 @@
+# Leo's trusted sites, used in the demo. An example, not a default: the
+# plugin ships with no list. Copy it to ~/.config/lapacho-factcheck/trusted.txt
+# and edit it; one domain per line, subdomains included.
+#
+# The tags after # are one person's judgment, to help you choose. They are not
+# read by the plugin and they endorse nothing. Two separate axes:
+#   lean:  left, center-left, center, center-right, right
+#   owner: [state-funded] public money behind it, [state-controlled] a
+#          government sets the line. Lean and ownership are different questions.
+
+# General news
+reuters.com           # center
+c-span.org            # center
+ballotpedia.org       # center
+theconversation.com   # center-left
+efe.com               # center-left, Spanish
+economist.com         # center, market-liberal
+ft.com                # center
+csmonitor.com         # center
+japantimes.co.jp      # center
+france24.com          # center, [state-funded], also in Spanish
+voanews.com           # center, [state-funded]
+
+# Science
+nature.com
+pnas.org
+newscientist.com
+britannica.com
+
+# Leo's addition
+honestreporting.com   # right, advocacy
+
+# Left out of the demo list. Uncomment them together for a wider mix.
+# apnews.com          # center-left
+# afp.com             # center-left
+# npr.org             # center-left, [state-funded] in part
+# dw.com              # center-left, [state-funded]
+# infobae.com         # center-right, Argentina
+# elpais.com          # center-left, Spain
+# lanacion.com.ar     # center-right, Argentina
+# clarin.com          # center, Argentina
+# batimes.com.ar      # center-right, Argentina
+
+# Outlets tied to a state, whatever their lean or how independent their
+# newsroom says it is. Off by default: they are useful to read and different
+# from evidence.
+# bbc.com             # center-left, [state-funded] by a licence fee
+# aljazeera.com       # [state-funded] Qatar
+# rt.com              # [state-controlled] Russia
+# sputnikglobe.com    # [state-controlled] Russia
+# hispantv.com        # [state-controlled] Iran
+# cgtn.com            # [state-controlled] China
+# telesurtv.net       # [state-funded] Venezuela and others
+# mbn.com             # [state-funded] USA (Middle East Broadcasting Networks)
