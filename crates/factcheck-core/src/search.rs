@@ -29,11 +29,15 @@ struct Organic {
     snippet: String,
 }
 
-/// `query` restricted to `trusted` sites; if that finds nothing (or the list
-/// is empty), the open search, marked untrusted.
+/// Google reads only the first 32 words of a query, and each `site:` and `OR`
+/// is one: a long list goes in groups, one search each.
+const SITES_PER_SEARCH: usize = 8;
+
+/// `query` restricted to `trusted` sites, a group at a time, until one finds
+/// something; if none does (or the list is empty), the open search, marked untrusted.
 pub fn search(key: &str, query: &str, trusted: &[String], per_query: usize) -> Result<Vec<Hit>> {
-    if !trusted.is_empty() {
-        let sites = trusted.iter().map(|s| format!("site:{s}")).collect::<Vec<_>>().join(" OR ");
+    for group in trusted.chunks(SITES_PER_SEARCH) {
+        let sites = group.iter().map(|s| format!("site:{s}")).collect::<Vec<_>>().join(" OR ");
         let hits = google(key, &format!("{query} ({sites})"), per_query, true)?;
         if !hits.is_empty() {
             return Ok(hits);
