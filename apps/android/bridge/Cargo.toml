@@ -1,0 +1,26 @@
+[package]
+name = "factcheck-bridge"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# factcheck-core for the Android plugin app, through uniffi.
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"
+required-features = ["bindgen"]
+
+[features]
+bindgen = ["uniffi/cli"]
+
+[dependencies]
+factcheck-core = { path = "../../../crates/factcheck-core" }
+anyhow = "1"
+thiserror = "2"
+uniffi = "0.28"
+
+[build-dependencies]
+uniffi = { version = "0.28", features = ["build"] }

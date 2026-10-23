@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Lapacho Fact-check</string>
+    <string name="settings_intro">Checks a clip with Gemma on this phone. Only the search queries leave it, to SerpApi, and you see them before they are sent. The verdict follows your trusted sites below, not the model\'s opinion.</string>
+    <string name="label_key">SerpApi key (serpapi.com, free plan: 250 searches a month)</string>
+    <string name="label_trusted">Trusted sites, one domain per line (# starts a comment). Empty: every source is marked unverified.</string>
+    <string name="label_model">Model (Gemma 4 E2B, GGUF, about 3.4 GB)</string>
+    <string name="model_ready">Model ready (%1$d MB).</string>
+    <string name="model_missing">No model yet: download it (Wi-Fi recommended).</string>
+    <string name="model_downloading">Downloading the model: %1$d of %2$d MB. Come back to this screen to see it finish.</string>
+    <string name="model_failed">The download failed. Check the URL and try again.</string>
+    <string name="download_model">Download the model</string>
+    <string name="err_url">The model URL must start with https://</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved</string>
+    <string name="writing_queries">Gemma is writing the search queries…</string>
+    <string name="confirm_queries">These queries will be sent to SerpApi. Edit them or cancel; nothing has left the phone yet.</string>
+    <string name="search">Search and check</string>
+    <string name="searching">Searching your sites and reading the results…</string>
+    <string name="err_nothing">The clip is empty.</string>
+    <string name="err_not_configured">Set the SerpApi key and download the model first.</string>
+    <string name="err_cancelled">Cancelled.</string>
+</resources>

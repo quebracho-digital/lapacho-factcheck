@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Lapacho Fact-check</string>
+    <string name="settings_intro">Verifica un clip con Gemma en este teléfono. Solo las búsquedas salen de él, hacia SerpApi, y las ves antes de que se envíen. El veredicto sigue tus sitios de confianza, no la opinión del modelo.</string>
+    <string name="label_key">Clave de SerpApi (serpapi.com, plan gratis: 250 búsquedas por mes)</string>
+    <string name="label_trusted">Sitios de confianza, un dominio por línea (# empieza un comentario). Vacío: toda fuente sale marcada como no verificada.</string>
+    <string name="label_model">Modelo (Gemma 4 E2B, GGUF, unos 3,4 GB)</string>
+    <string name="model_ready">Modelo listo (%1$d MB).</string>
+    <string name="model_missing">Todavía no hay modelo: descargalo (mejor con Wi-Fi).</string>
+    <string name="model_downloading">Descargando el modelo: %1$d de %2$d MB. Volvé a esta pantalla para verlo terminar.</string>
+    <string name="model_failed">Falló la descarga. Revisá la URL y probá de nuevo.</string>
+    <string name="download_model">Descargar el modelo</string>
+    <string name="err_url">La URL del modelo tiene que empezar con https://</string>
+    <string name="save">Guardar</string>
+    <string name="saved">Guardado</string>
+    <string name="writing_queries">Gemma está escribiendo las búsquedas…</string>
+    <string name="confirm_queries">Estas búsquedas se van a enviar a SerpApi. Editalas o cancelá; todavía no salió nada del teléfono.</string>
+    <string name="search">Buscar y verificar</string>
+    <string name="searching">Buscando en tus sitios y leyendo los resultados…</string>
+    <string name="err_nothing">El clip está vacío.</string>
+    <string name="err_not_configured">Primero cargá la clave de SerpApi y descargá el modelo.</string>
+    <string name="err_cancelled">Cancelado.</string>
+</resources>

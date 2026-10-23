@@ -1,0 +1,37 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- The reason this is an app of its own: it needs the network (SerpApi
+         and the model download), and Lapacho and its keyboard must not have it. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- allowBackup=false: the SerpApi key stays on this phone.
+         largeHeap: the model is mmapped, but llama.cpp's buffers are not small. -->
+    <application
+        android:allowBackup="false"
+        android:label="@string/app_name"
+        android:icon="@android:drawable/ic_menu_search"
+        android:largeHeap="true"
+        android:theme="@android:style/Theme.DeviceDefault">
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- How Lapacho finds and runs it. Exported: Lapacho is another app.
+             The clip arrives in an Intent extra and is never stored. -->
+        <activity
+            android:name=".RunActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden">
+            <intent-filter>
+                <action android:name="digital.quebracho.lapacho.action.RUN_PLUGIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
