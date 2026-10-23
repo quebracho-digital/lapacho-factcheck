@@ -169,9 +169,67 @@ Results, Gemma 4 E2B Q4_K_M on a laptop CPU (`train/data/eval_out/`):
 | First query finds the claim's Wikipedia article (95) | 33 | 29 |
 | Seconds: queries / verdict | 3.0 / 13.5 | 4.5 / 13.4 |
 
-The expected verdicts are the datasets' and haven't been reviewed by a person
-yet. The teacher disagrees with them on 28 of the 99 claims; there the
-fine-tune goes from 4 to 15 right, so it isn't only copying the teacher.
+The table above uses the datasets' expected verdicts as they came. They were
+not all right; see the next section for what we changed and what the numbers
+look like after.
+
+### Adjudicating the eval (`train/adjudicate.py`, `train/data/eval_adjudication.json`)
+
+How the expected verdicts were checked, in order, so you can follow or redo it:
+
+1. **The teacher as a flag.** Qwen3.6-35B-A3B answered the eval with the app's
+   own prompt. It disagreed with the datasets' verdict on 28 of the 99 claims
+   (marked ⚠ in `train/data/eval_review.md`).
+2. **Three outside models as a panel.** The review file went to Gemini,
+   Perplexity and getmerlin, asking for patterns and a ruling on each ⚠. They
+   disagreed with each other (on e016, e028, e029, e056 and e073), so none of
+   them was taken as the answer.
+3. **Each ⚠ read against its own passages**, by Claude Code, with one rule:
+   *judge only from the passages shown.* A passage that doesn't name the
+   claim's subject ("The film was heavily panned...", "It has earned 62.06
+   crore") can't support or contradict it. The datasets keep the Wikipedia
+   page title next to the sentence; the model never sees it.
+4. **Every decision is in `eval_adjudication.json`**, with a reason and a
+   note, and the original verdict stays in `gold_original`:
+   - 15 changed to *not enough evidence* (11 for a missing subject, 4 because
+     the passage doesn't actually settle the claim),
+   - 3 changed to what the passage says (e046, e060, e084),
+   - 2 dropped as ambiguous claims (e037, e051),
+   - 4 kept although the teacher disagreed, because the teacher was wrong
+     (e011, e056, e073, e079: e.g. it used what it knows about Phoenix instead
+     of what the passage says),
+   - 4 political passages rewritten (see below).
+5. **A person has not reviewed this yet.** The 8 outlet copies of the changed
+   items follow their base item.
+
+The political pairs had a different problem. The passage said "the
+administration confirmed" and the claim said "the mayor announced yesterday",
+a detail the passage lacks, and the teacher judged the two sides differently
+(*not enough evidence* for macrista, *supported* for kirchnerista). That is
+the teacher's own bias showing, and it also made the test unclean, so the four
+passages (p-en-9, p-es-3) were rewritten to state the claim. Old runs saw the
+old text: those four are left out of the rescore and need a new run.
+
+`python3 -I train/adjudicate.py train/data/eval_out/NAME.jsonl` rescores a
+finished run against the adjudicated verdicts.
+
+| Verdict accuracy, claims only (no copies or pairs) | stock E2B | fine-tuned |
+|---|---|---|
+| Expected verdicts as they came (99) | 57.6% | 77.8% |
+| Adjudicated, strict rule (97) | 70.1% | 78.4% |
+| · "not enough evidence" right, as they came (25) | 17 | 19 |
+| · "not enough evidence" right, adjudicated (36) | **28** | 24 |
+
+What the stricter eval says, plainly: **the fine-tune's lead shrinks from 20
+points to 8**, and on *not enough evidence*, the answer we care about most,
+the stock model now does better (28 of 36 against 24 of 36). The training
+data very likely has the same flaw as the eval: Wikipedia sentences with the
+subject replaced by "The film...", labelled *supported* (a rough check finds
+154 of 995 *supported* rows citing a passage that opens with a pronoun or a
+generic noun; not yet audited). The tuned model learned to
+fill the missing subject in, which is what the rule says not to do. Fixing
+the training set the same way, and training again, is the next step; we ship
+the numbers as they are.
 
 ## How it is built
 

@@ -1,0 +1,60 @@
+{
+ "file": "train/data/eval_out/e2b-base-q4km.adjudicated.jsonl",
+ "items": 149,
+ "json_valid_%": 100.0,
+ "claim_count_right_%": 96.6,
+ "verdict_accuracy_%": {
+  "all": 77.1,
+  "gold:contradicted": 72.3,
+  "gold:not_enough_evidence": 80.8,
+  "gold:supported": 77.8,
+  "kind:confident_offtopic": 87.5,
+  "kind:es_claim_en_passages": 40.0,
+  "kind:flip_outlet": 87.5,
+  "kind:flip_political": 93.8,
+  "kind:injection": 50.0,
+  "kind:multi": 12.5,
+  "kind:single": 79.4,
+  "lang:en": 72.6,
+  "lang:es": 82.6
+ },
+ "confusion": {
+  "supported→supported": 42,
+  "not_enough_evidence→not_enough_evidence": 42,
+  "contradicted→contradicted": 34,
+  "contradicted→not_enough_evidence": 11,
+  "not_enough_evidence→supported": 8,
+  "supported→contradicted": 7,
+  "supported→not_enough_evidence": 5,
+  "contradicted→supported": 2,
+  "not_enough_evidence→contradicted": 2
+ },
+ "citations": {
+  "predicted_sure": 95,
+  "source_in_range": 87,
+  "quote_in_that_passage": 87,
+  "right_source": 71
+ },
+ "flip": {
+  "flip_outlet:groups": 20,
+  "flip_outlet:flipped": 1,
+  "flip_political:groups": 8,
+  "flip_political:flipped": 1
+ },
+ "queries": {
+  "clips": 93,
+  "has_1_to_3": 93,
+  "n_queries": 150,
+  "en_clips": 52,
+  "en_clips_all_queries_in_lang": 51,
+  "searched": 93,
+  "first_query_finds_article": 32,
+  "es_clips": 41,
+  "es_clips_all_queries_in_lang": 13
+ },
+ "secs": {
+  "queries_secs": 3.0,
+  "verdict_secs": 13.4
+ },
+ "searches_left_in_budget": 110
+}
