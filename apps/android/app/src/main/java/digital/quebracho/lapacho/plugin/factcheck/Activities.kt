@@ -8,6 +8,7 @@ import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.widget.Button
@@ -75,9 +76,15 @@ private fun Activity.column(): LinearLayout = LinearLayout(this).apply {
     orientation = LinearLayout.VERTICAL
     val pad = dp(20f)
     setPadding(pad, pad * 2, pad, pad)
+    // Takes the first focus, so the screen opens at the top and not scrolled to a text field.
+    isFocusableInTouchMode = true
 }
 
-private fun Activity.scrolling(content: LinearLayout) = ScrollView(this).apply { addView(content) }
+// targetSdk 35 draws edge to edge: the content keeps clear of the system bars itself.
+private fun Activity.scrolling(content: LinearLayout) = ScrollView(this).apply {
+    fitsSystemWindows = true
+    addView(content)
+}
 
 /** The launcher screen: the SerpApi key, the trusted sites, the model. */
 class SettingsActivity : Activity() {
@@ -256,7 +263,10 @@ class RunActivity : Activity() {
 
     private fun <T> background(work: () -> T, then: (T) -> Unit) {
         Thread {
+            val t0 = System.currentTimeMillis()
             val result = runCatching(work)
+            // Outcome and time only, never the clip or the verdict.
+            Log.i("factcheck", "step ${if (result.isSuccess) "ok" else "failed: ${result.exceptionOrNull()}"} in ${System.currentTimeMillis() - t0} ms")
             runOnUiThread {
                 if (cancelled || isFinishing) return@runOnUiThread
                 result.fold(
