@@ -231,6 +231,10 @@ fill the missing subject in, which is what the rule says not to do. Fixing
 the training set the same way, and training again, is the next step; we ship
 the numbers as they are.
 
+## Process
+
+How the model was built, measured and fixed, with every decision and its reason: [`docs/PROCESS.md`](docs/PROCESS.md) (current state) and [`docs/LOG.md`](docs/LOG.md) (dated log).
+
 ## How it is built
 
 One Rust core, two front ends, the same shape as Lapacho Voice:
