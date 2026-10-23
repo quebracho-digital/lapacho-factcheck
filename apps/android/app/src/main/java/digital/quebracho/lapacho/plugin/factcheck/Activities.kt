@@ -43,7 +43,7 @@ private class Settings(private val context: Context) {
     /** The trusted.txt text; the demo list until the user saves their own. */
     var trusted: String
         get() = prefs.getString("trusted", null)
-            ?: context.assets.open("trusted-mbfc.txt").bufferedReader().use { it.readText() }
+            ?: context.assets.open("trusted-example.txt").bufferedReader().use { it.readText() }
         set(v) = prefs.edit().putString("trusted", v).apply()
     var modelUrl: String
         get() = prefs.getString("model_url", DEFAULT_MODEL_URL).orEmpty()
