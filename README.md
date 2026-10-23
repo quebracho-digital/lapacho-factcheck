@@ -78,6 +78,11 @@ cp examples/trusted-example.txt ~/.config/lapacho-factcheck/trusted.txt  # then 
 cp apps/desktop/fact-check-gemma.json ~/.local/share/digital.quebracho.lapacho/plugins/
 ```
 
+Optional: `~/.config/lapacho-factcheck/search_url` is the URL prefix the query is
+appended to for the plain-text search link shown under each query in the
+preview. Default `https://www.google.com/search?q=` until the hackathon ends,
+then Brave Search.
+
 The plugin shows up the next time you open a clip in Lapacho. The model is
 any Gemma 4 GGUF; ours is
 [quebracho-digital/gemma-4-E2B-it-factcheck](https://huggingface.co/quebracho-digital/gemma-4-E2B-it-factcheck)
