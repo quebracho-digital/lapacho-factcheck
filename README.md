@@ -93,6 +93,13 @@ ANDROID_NDK_HOME=~/Android/Sdk/ndk/27.2.12479018 gradle :app:assembleDebug
 The app downloads the model on first run (3.4 GB, from Hugging Face) and
 answers Lapacho's `RUN_PLUGIN` intent like *Lapacho Terms*.
 
+### CI and releases
+
+GitHub Actions builds and tests the Rust core on every push and pull request.
+Android builds (`app-debug.apk`) run on PRs and pushes to `main`. Pushing a
+tag like `v1.0.0` builds a release APK, signs it with the release key (if the
+secrets are set) and publishes it as a GitHub release.
+
 ## Trusted sites
 
 `~/.config/lapacho-factcheck/trusted.txt`, one domain per line. An empty or
