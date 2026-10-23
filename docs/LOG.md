@@ -33,3 +33,9 @@ Current state is in [`PROCESS.md`](PROCESS.md).
 **L-013 · 2026-10-23 · decision** · New sources go first into a held-out real-document eval (Federal Register, Boletín Oficial, one or two open-licence Spanish theses), not into the overnight training. · Change one thing at a time so the result can be attributed. · Plan in PROCESS.md section 8.
 
 **L-014 · 2026-10-23 · change** · Published on HF: `quebracho-digital/lapacho-factcheck-data` (train, eval, eval_adjudicated) and `quebracho-digital/gemma-4-E2B-it-factcheck` (Q4_K_M, Q8_0, adapter), after the jury review of the eval (L-005..L-008). Files and sizes checked against the API. · Ship the v1 numbers with their limits. · huggingface.co API tree listing; commit 2fac75c (README, cards).
+
+**L-015 · 2026-10-23 · decision** · Human review of the dataset is out of this version: no time and no expertise on the team. It moves to the next version, with a more curated dataset from the new sources. README says so. · Say plainly what was and was not checked; the jury of models (L-005..L-008) is not a person. · README, "Adjudicating the eval", point 5.
+
+**L-016 · 2026-10-23 · decision** · Ablation kept basic, to measure one thing: the effect of repairing the training rows. Two LoRAs, same recipe, 600 rows each (seed 0), one from `train.jsonl` and one from `train_repaired.jsonl`; same strict eval. New sources come after, as a separate step. · One change at a time (L-013). · `train/ablate.sh`.
+
+**L-017 · 2026-10-23 · change** · Ablation launched on minisforum (74 steps per arm, about 50 min each, teacher router stopped while it runs; restarts by itself on exit). Note: the first `ssh ... nohup &` call hung the client until its timeout; the job itself was fine. · — · `~/factcheck-train/work/ablate.log`.

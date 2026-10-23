@@ -222,8 +222,10 @@ How the expected verdicts were checked, in order, so you can follow or redo it:
      (e011, e056, e073, e079: e.g. it used what it knows about Phoenix instead
      of what the passage says),
    - 4 political passages rewritten (see below).
-5. **A person has not reviewed this yet.** The 8 outlet copies of the changed
-   items follow their base item.
+5. **A person has not reviewed this yet.** For lack of time and expertise, the
+   human review of the dataset is left for the next version, with a more
+   curated dataset built on the new sources (see PROCESS.md section 8). The 8
+   outlet copies of the changed items follow their base item.
 
 The political pairs had a different problem. The passage said "the
 administration confirmed" and the claim said "the mayor announced yesterday",
