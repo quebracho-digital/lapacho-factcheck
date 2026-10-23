@@ -31,3 +31,5 @@ Current state is in [`PROCESS.md`](PROCESS.md).
 **L-012 · 2026-10-23 · finding** · Repair noise seen in a spot check: the teacher sometimes inserts a wrong name (film title in place of the character). · Rate unknown. · Audit of 50 rows planned.
 
 **L-013 · 2026-10-23 · decision** · New sources go first into a held-out real-document eval (Federal Register, Boletín Oficial, one or two open-licence Spanish theses), not into the overnight training. · Change one thing at a time so the result can be attributed. · Plan in PROCESS.md section 8.
+
+**L-014 · 2026-10-23 · change** · Published on HF: `quebracho-digital/lapacho-factcheck-data` (train, eval, eval_adjudicated) and `quebracho-digital/gemma-4-E2B-it-factcheck` (Q4_K_M, Q8_0, adapter), after the jury review of the eval (L-005..L-008). Files and sizes checked against the API. · Ship the v1 numbers with their limits. · huggingface.co API tree listing; commit 2fac75c (README, cards).
