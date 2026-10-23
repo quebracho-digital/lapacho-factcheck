@@ -39,3 +39,5 @@ Current state is in [`PROCESS.md`](PROCESS.md).
 **L-016 · 2026-10-23 · decision** · Ablation kept basic, to measure one thing: the effect of repairing the training rows. Two LoRAs, same recipe, 600 rows each (seed 0), one from `train.jsonl` and one from `train_repaired.jsonl`; same strict eval. New sources come after, as a separate step. · One change at a time (L-013). · `train/ablate.sh`.
 
 **L-017 · 2026-10-23 · change** · Ablation launched on minisforum (74 steps per arm, about 50 min each, teacher router stopped while it runs; restarts by itself on exit). Note: the first `ssh ... nohup &` call hung the client until its timeout; the job itself was fine. · — · `~/factcheck-train/work/ablate.log`.
+
+**L-018 · 2026-10-23 · finding** · Licence check of the agreed sources. Federal Register: federal works, only logos/seals restricted, but the explicit terms page was behind a bot gate and not read. Boletín Oficial (AR): no reuse licence found; the legal notice is silent. · Do not train on either until confirmed; for now they only feed the held-out eval idea. · PROCESS.md section 7.

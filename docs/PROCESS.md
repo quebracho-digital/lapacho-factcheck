@@ -84,7 +84,9 @@ All 583 new or changed rows were checked: every quote is inside its passage. **K
 | The Bible | rejected | poor fit: claims about scripture are interpretive |
 | Archivo General de la Nación | postponed | reuse terms not confirmed; scanned historical documents |
 | Interviews | rejected | copyright belongs to the outlet; transcripts do not free them |
-| Federal Register, Boletín Oficial, court opinions | planned (section 8) | government works / open data; confirm the exact licence of each site before publishing a derived set |
+| Federal Register | planned, licence half-checked | Text of US federal documents is generally not copyrighted (federal works); the OFR developer page only restricts using its logos and seals. The page with the explicit reuse statement redirected to a bot gate (unblock.federalregister.gov) and was not read: confirm by hand before publishing |
+| Boletín Oficial (AR) | planned, licence NOT confirmed | The site's legal notice says nothing on reuse; open-data decree 117/2016 exists but no licence for the Boletín was found. Provincial Buenos Aires norms are CC BY 4.0 (SAIJ dataset). Ask or find the terms before training on it |
+| Court opinions | planned (section 8) | confirm the licence of each court's site first |
 | University theses | planned, 1–2 | licence varies per document; accept only CC BY / CC0, checked one by one |
 
 ## 8. Plan and how to reproduce
