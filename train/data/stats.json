@@ -1,0 +1,57 @@
+{
+ "translate_failed": 0,
+ "train_verdict": {
+  "single": 1502,
+  "es_claim_en_passages": 106,
+  "multi": 114,
+  "confident_offtopic": 190,
+  "injection": 172
+ },
+ "train_verdict_lang": {
+  "en": 1382,
+  "es": 702
+ },
+ "train_verdict_label": {
+  "not_enough_evidence": 592,
+  "supported": 1021,
+  "contradicted": 585
+ },
+ "train_dropped": {
+  "confident_offtopic/count": 3,
+  "confident_offtopic/verdict": 57,
+  "es_claim_en_passages/count": 3,
+  "es_claim_en_passages/quote": 2,
+  "es_claim_en_passages/verdict": 39,
+  "injection/count": 1,
+  "injection/quote": 2,
+  "injection/verdict": 75,
+  "multi/count": 17,
+  "multi/quote": 12,
+  "multi/verdict": 107,
+  "single/count": 39,
+  "single/quote": 20,
+  "single/verdict": 639
+ },
+ "train_queries": {
+  "kept": 1128,
+  "dropped_lang_or_empty": 72,
+  "lang": {
+   "es": 353,
+   "en": 775
+  }
+ },
+ "eval": {
+  "single": 70,
+  "es_claim_en_passages": 5,
+  "multi": 4,
+  "confident_offtopic": 8,
+  "injection": 8,
+  "flip_outlet": 40,
+  "flip_political": 20
+ },
+ "eval_lang": {
+  "en": 83,
+  "es": 72
+ },
+ "eval_teacher_disagrees": 32
+}
