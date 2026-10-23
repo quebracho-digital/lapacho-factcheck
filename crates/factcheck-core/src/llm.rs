@@ -53,8 +53,7 @@ impl Llm {
 
         let mut sampler = LlamaSampler::greedy();
         let mut out = Vec::new();
-        let mut pos = tokens.len() as i32;
-        for _ in 0..max_tokens {
+        for pos in (tokens.len() as i32..).take(max_tokens) {
             let token = sampler.sample(&ctx, batch.n_tokens() - 1);
             sampler.accept(token);
             if vocab.is_eog(token) {
@@ -63,7 +62,6 @@ impl Llm {
             out.extend(vocab.token_to_piece(token, false, None));
             batch.clear();
             batch.add(token, pos, &[0], true)?;
-            pos += 1;
             ctx.decode(&mut batch)?;
         }
         Ok(String::from_utf8_lossy(&out).into_owned())
